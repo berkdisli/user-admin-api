@@ -13,6 +13,10 @@ const cors = require("cors");
 app.use(morgan("dev"));
 app.use(cors());
 
+// router
+const usersRouter = require("./src/routes/users.js");
+app.use("/api/users", usersRouter);
+
 //admin
 const isAdmin = (req, res, next) => {
     req.body.admin = true;
