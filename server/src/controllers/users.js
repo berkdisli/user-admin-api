@@ -1,6 +1,6 @@
-let User = require("../models/users")
+let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
-const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword.js");
+const { generateHashPassword } = require("../helpers/securePassword");
 
 const getAllUsers = async (req, res) => {
     try {
@@ -48,6 +48,7 @@ const addUser = async (req, res) => {
             name: req.body.name,
             email: req.body.email,
             age: req.body.age,
+            phone: req.body.phone,
             password: await generateHashPassword(req.body.password)
         });
         const user = await newUser.save();
@@ -82,7 +83,8 @@ const updateUser = async (req, res) => {
                     name: req.body.name,
                     email: req.body.email,
                     age: req.body.age,
-                    password: req.body.password
+                    password: req.body.password,
+                    phone: req.body.phone
                 }
             }
         );
