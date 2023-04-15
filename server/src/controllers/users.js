@@ -1,6 +1,8 @@
+const jwt = require('jsonwebtoken');
 let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword } = require("../helpers/securePassword");
+const dev = require("../config/users")
 
 const getAllUsers = async (req, res) => {
     try {
@@ -116,4 +118,44 @@ const deleteUser = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers, getSingleUser, addUser, updateUser, deleteUser }
+const registerUser = async (req, res) => {
+    try {
+        const { name, email, password, age, phone } = req.fields;
+        const { image } = req.files;
+
+        if (!name || !email || !password || !age || !phone) {
+            return res.status(404).json({
+                message: `name, email, age or password is missing`
+            });
+        }
+        if (password.lenght < 6) {
+            return res.status(404).json({
+                message: `min password lenghth is 6 `
+            });
+        }
+        if (image && image.size > 1000000) {
+            return res.status(404).json({
+                message: `max size of image is 1mb `
+            });
+        }
+
+        const isExist = await User.findOne({ email: email });
+        if (isExist) {
+            return res.status(400).json({
+                message: `the user with this email already exists`
+            })
+        }
+        const hashedPassword = await generateHashPassword(password)
+        const token = jwt.sign({ name, email, age, hashedPassword, phone, image }, dev.app.jwtSecretKey, { expiresIn: "10m" });
+
+        return res.status(201).json({
+            token: token,
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+}
+
+module.exports = { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser }
