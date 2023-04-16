@@ -2,7 +2,8 @@ const jwt = require('jsonwebtoken');
 let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
-const dev = require("../config/users")
+const dev = require("../config/users");
+const { sendEmailWithNodeMailer } = require("../helpers/email");
 
 const getAllUsers = async (req, res) => {
     try {
@@ -149,8 +150,21 @@ const registerUser = async (req, res) => {
         const hashedPassword = await generateHashPassword(password)
         const token = jwt.sign({ name, email, age, hashedPassword, phone, image }, secretKey, { expiresIn: "10m" });
 
+        //prepare email
+        const emailData = {
+            email,
+            subject: "Account activation email",
+            html: `
+            <h2>Hello ${name}!</h2>
+            <p> Please click here to <a href= "${dev.app.clientURL}/api/users/activate/
+            ${token}" target = "_blank">activate your account </a> </p>
+            `
+        };
+        sendEmailWithNodeMailer(emailData);
+
         return res.status(201).json({
             token: token,
+            message: "A verification link has been sent to your email"
         })
     } catch (err) {
         res.status(500).json({
