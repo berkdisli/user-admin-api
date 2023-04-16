@@ -145,8 +145,9 @@ const registerUser = async (req, res) => {
                 message: `the user with this email already exists`
             })
         }
+        const secretKey = dev.app.jtwSecretKey
         const hashedPassword = await generateHashPassword(password)
-        const token = jwt.sign({ name, email, age, hashedPassword, phone, image }, dev.app.jwtSecretKey, { expiresIn: "10m" });
+        const token = jwt.sign({ name, email, age, hashedPassword, phone, image }, secretKey, { expiresIn: "10m" });
 
         return res.status(201).json({
             token: token,
