@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
-const { generateHashPassword } = require("../helpers/securePassword");
+const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const dev = require("../config/users")
 
 const getAllUsers = async (req, res) => {
@@ -159,4 +159,35 @@ const registerUser = async (req, res) => {
     }
 }
 
-module.exports = { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser }
+const loginUser = async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email });
+
+        if (!user) {
+            return res.status(404).json({
+                message: `User doesn't exist. Please register first`
+            });
+        }
+
+        const isPasswordMatched = compareHashPassword(req.body.password, user.password)
+
+        if (!isPasswordMatched) {
+            return res.status(401).json({
+                message: `Not authorised, email and password didn't match`
+            });
+        }
+        return res.status(200).json({
+            user: {
+                name: user.name,
+                email: user.email
+            },
+            message: "login successfull",
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        });
+    }
+}
+
+module.exports = { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser, loginUser }
