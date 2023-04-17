@@ -13,6 +13,10 @@ const cors = require("cors");
 app.use(morgan("dev"));
 app.use(cors());
 
+//cookie
+var cookieParser = require('cookie-parser')
+app.use(cookieParser());
+
 // router
 const usersRouter = require("./src/routes/users.js");
 app.use("/api/users", usersRouter);

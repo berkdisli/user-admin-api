@@ -154,6 +154,9 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: "Unauthorized: please confirm your email first" })
         }
 
+        req.session.userId = user._id;
+        console.log(req.session)
+
         res.status(200).json({ message: `Welcome, ${user.name}!` });
     } catch (error) {
         res.status(500).json({ message: `Server Error: ${error.message}` });
