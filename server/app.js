@@ -22,12 +22,6 @@ const isAdmin = (req, res, next) => {
     req.body.admin = true;
     next();
 }
-app.post("/users", isAdmin, (req, res) => {
-    if (req.body.admin) {
-        return res.status(201).json({ message: " user was created " })
-    }//403: no access
-    return res.status(403).json({ message: " only admin has an access" })
-});
 
 //server working
 app.get("/", (req, res) => {
