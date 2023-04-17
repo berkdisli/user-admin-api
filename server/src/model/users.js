@@ -37,7 +37,7 @@ const usersSchema = new mongoose.Schema({
         required: [true, "password is required"]
     },
     is_admin: {
-        type: String,
+        type: Number,
         default: 0
     },
     is_verified: {

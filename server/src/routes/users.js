@@ -1,7 +1,7 @@
 const express = require("express");
 const { body, validationResult } = require('express-validator');
 const formidable = require("express-formidable")
-const { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser, loginUser } = require("../controllers/users");
+const { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser, loginUser, verifyEmail } = require("../controllers/users");
 const router = express.Router();
 
 router.get("/", getAllUsers);
@@ -16,6 +16,7 @@ router.post("/", body('name').trim().isLength({ min: 2 }).withMessage("minimum l
     }, addUser);
 router.post("/register", formidable(), registerUser);
 router.post("/login", loginUser);
+router.post("/verify-email", verifyEmail);
 router.put("/:id", updateUser);
 router.delete("/:id", deleteUser);
 

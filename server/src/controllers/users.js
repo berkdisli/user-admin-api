@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const fs = require('fs')
 let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
@@ -125,13 +126,14 @@ const registerUser = async (req, res) => {
         const { image } = req.files;
 
         if (!name || !email || !password || !age || !phone) {
-            return res.status(404).json({
+            res.status(404).json({
                 message: `name, email, age or password is missing`
             });
+            return
         }
         if (password.lenght < 6) {
             return res.status(404).json({
-                message: `min password lenghth is 6 `
+                message: `min password length is 6 `
             });
         }
         if (image && image.size > 1000000) {
@@ -175,33 +177,98 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     try {
-        const user = await User.findOne({ email: req.body.email });
+        const { email, password } = req.body;
 
-        if (!user) {
+        if (!email || !password)
+            return res
+                .status(400)
+                .json({ message: "Bad Request: some of the fields are missing" });
+
+        if (password.length < 8)
+            return res.status(400).json({
+                message: "Bad Request: password length is not valid",
+            });
+
+        const user = await User.findOne({ email });
+        if (!user)
+            return res.status(400).json({
+                message:
+                    "Bad Request: user with this email does not exist. Sign up first",
+            });
+
+        const isPasswordMatch = await compareHashPassword(password, user.password);
+
+        if (!isPasswordMatch)
+            return res.status(400).json({ message: "Bad Request: invalid email or password" })
+
+        if (user.is_verified === 0) {
+            return res.status(401).json({ message: "Unauthorized: please confirm your email first" })
+        }
+
+        res.status(200).json({ message: `Welcome, ${user.name}!` });
+    } catch (error) {
+        res.status(500).json({ message: `Server Error: ${error.message}` });
+    }
+};
+
+const verifyEmail = async (req, res) => {
+    try {
+        const { token } = req.body;
+        if (!token) {
             return res.status(404).json({
-                message: `User doesn't exist. Please register first`
+                message: "token is missing",
             });
         }
 
-        const isPasswordMatched = compareHashPassword(req.body.password, user.password)
+        const secretKey = dev.app.jtwSecretKey
+        jwt.verify(token, secretKey, async function (err, decoded) {
+            if (err) {
+                return res.status(401).json({
+                    message: "Token is expired",
+                })
+            }
+            const { name, email, hashedPassword, phone, image, age } = decoded;
+            const isExist = await User.findOne({ email: email });
+            if (isExist)
+                return res.status(400).json({
+                    message: `the user already exist`
+                })
 
-        if (!isPasswordMatched) {
-            return res.status(401).json({
-                message: `Not authorised, email and password didn't match`
-            });
-        }
+            //create user without image
+            const newUser = new User({
+                id: await getUniqueId(),
+                name: name,
+                password: hashedPassword,
+                email: email,
+                age: age,
+                phone: phone,
+                is_verified: 1,
+            })
+
+            if (image) {
+                newUser.image.data = fs.readFileSync(image.path);
+                newUser.image.contentType = image.type;
+            }
+
+            //save the user
+            const user = await newUser.save()
+            if (!user) {
+                return res.status(400).json({
+                    message: `the user was not created`
+                })
+            }
+        });
+
+
         return res.status(200).json({
-            user: {
-                name: user.name,
-                email: user.email
-            },
-            message: "login successfull",
-        })
+            message: "the user was created and ready to sign in",
+        });
     } catch (err) {
         res.status(500).json({
             message: err.message
         });
     }
-}
+};
 
-module.exports = { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser, loginUser }
+
+module.exports = { getAllUsers, getSingleUser, addUser, updateUser, deleteUser, registerUser, loginUser, verifyEmail }
