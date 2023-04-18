@@ -153,9 +153,8 @@ const loginUser = async (req, res) => {
         if (user.is_verified === 0) {
             return res.status(401).json({ message: "Unauthorized: please confirm your email first" })
         }
-
+        //creating session => cookie
         req.session.userId = user._id;
-        console.log(req.session)
 
         res.status(200).json({ message: `Welcome, ${user.name}!` });
     } catch (error) {
@@ -232,4 +231,16 @@ const logoutUser = async (req, res) => {
     }
 };
 
-module.exports = { getAllUsers, updateUser, deleteUser, registerUser, loginUser, verifyEmail, logoutUser }
+const userProfile = async (req, res) => {
+    try {
+        return res.status(200).json({
+            message: "user profile",
+        })
+    } catch (err) {
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+};
+
+module.exports = { getAllUsers, updateUser, deleteUser, registerUser, loginUser, verifyEmail, logoutUser, userProfile }

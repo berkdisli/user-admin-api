@@ -1,7 +1,8 @@
 const express = require("express");
 const formidable = require("express-formidable");
 const session = require("express-session");
-const { getAllUsers, updateUser, deleteUser, registerUser, loginUser, verifyEmail, logoutUser } = require("../controllers/users");
+const { getAllUsers, updateUser, deleteUser, registerUser, loginUser, verifyEmail, userProfile, logoutUser } = require("../controllers/users");
+const { isLoggedIn } = require("../middlewares/auth");
 const userRouter = express.Router();
 const dev = require("../config/users")
 
@@ -11,16 +12,17 @@ userRouter.use(
         secret: dev.app.sessionSecretKey,
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: false, maxAge: 600 }
+        cookie: { secure: false, maxAge: 60000 }
     })
 )
 
-userRouter.get("/", getAllUsers);
+userRouter.get("/all-users", getAllUsers);
 userRouter.post("/register", formidable(), registerUser);
 userRouter.post("/login", loginUser);
-userRouter.get("/logout", logoutUser);
+userRouter.get("/logout", isLoggedIn, logoutUser);
 userRouter.post("/verify-email", verifyEmail);
-userRouter.put("/:id", updateUser);
-userRouter.delete("/:id", deleteUser);
+userRouter.get("/", isLoggedIn, userProfile);
+userRouter.put("/:id", isLoggedIn, updateUser);
+userRouter.delete("/:id", isLoggedIn, deleteUser);
 
 module.exports = userRouter;
