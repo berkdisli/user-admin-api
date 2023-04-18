@@ -51,6 +51,10 @@ const usersSchema = new mongoose.Schema({
     image: {
         data: Buffer,
         contentType: String
+    },
+    isBanned: {
+        type: Boolean,
+        default: false
     }
 })
 

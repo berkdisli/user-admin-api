@@ -22,32 +22,28 @@ const getAllUsers = async (req, res) => {
 
 const updateUser = async (req, res) => {
     try {
-        const user = await User.findOne({ id: req.params.id });
-        console.log(user);
-        if (!user) {
-            return res.status(400).json({
-                message: `the user couldn't be found`
-            });
-        }
-        const updateTheUser = await User.updateOne(
-            { id: req.params.id },
-            {
-                $set: {
-                    name: req.body.name,
-                    email: req.body.email,
-                    age: req.body.age,
-                    password: req.body.password,
-                    phone: req.body.phone
-                }
-            }
+        const updatedData = await User.findByIdAndUpdate(req.session.userId,
+            { ...req.fields },
+            { new: true }
         );
-        if (!updateTheUser) {
+
+        if (!updatedData) {
             return res.status(400).json({
+                ok: false,
                 message: `the user couldn't be updated`,
+                data: updatedData
             });
         }
+
+        if (req.files.image) {
+            const { image } = req.files;
+            updatedData.image.data = fs.readFileSync(image.path);
+            updatedData.image.contentType = image.type;
+        }
+        await updatedData.save();
+
         return res.status(200).json({
-            message: "a user was updated",
+            message: "the user was successfully updated",
         });
     } catch (err) {
         res.status(500).json({
@@ -58,9 +54,10 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        await User.deleteOne({ id: req.params.id })
+        await User.findByIdAndDelete(req.session.userId)
         return res.status(200).json({
-            message: "a user was deleted",
+            ok: true,
+            message: "the user was deleted successfully",
         });
     } catch (err) {
         res.status(500).json({
@@ -223,8 +220,8 @@ const verifyEmail = async (req, res) => {
 
 const logoutUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        console.log(email, password);
+        req.session.destroy();
+        res.clearCookie("user_session");
         res.status(200).json({ message: "Log out is successfull" });
     } catch (error) {
         res.status(500).json({ message: `Server Error: ${error.message}` });
@@ -233,8 +230,11 @@ const logoutUser = async (req, res) => {
 
 const userProfile = async (req, res) => {
     try {
+        const userData = await User.findById(req.session.userId)
         return res.status(200).json({
+            ok: true,
             message: "user profile",
+            user: userData
         })
     } catch (err) {
         return res.status(500).json({

@@ -12,4 +12,17 @@ const isLoggedIn = (req, res, next) => {
     }
 }
 
-module.exports = { isLoggedIn }
+const isLoggedOut = (req, res, next) => {
+    try {
+        if (req.session.userId) {
+            return res.status(400).json({
+                message: "please logout",
+            })
+        }
+        next()
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+module.exports = { isLoggedIn, isLoggedOut }
