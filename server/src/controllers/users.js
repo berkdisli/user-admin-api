@@ -306,6 +306,7 @@ const resetPassword = async (req, res) => {
                     message: "Token is expired",
                 })
             }
+
             const { email, hashedPassword } = decoded;
             const isExist = await User.findOne({ email: email });
             if (!isExist)
@@ -318,7 +319,6 @@ const resetPassword = async (req, res) => {
                 {
                     $set: {
                         password: hashedPassword
-
                     }
                 })
 
