@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const dev = require("./users")
+const dev = require(".")
 const DB_URL = dev.db.url;
 
 const connectDB = async () => {

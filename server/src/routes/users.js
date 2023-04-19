@@ -4,7 +4,7 @@ const session = require("express-session");
 const { getAllUsers, updateUser, deleteUser, registerUser, loginUser, verifyEmail, userProfile, logoutUser, forgetPassword, resetPassword } = require("../controllers/users");
 const { isLoggedIn, isLoggedOut } = require("../middlewares/auth");
 const userRouter = express.Router();
-const dev = require("../config/users")
+const dev = require("../config")
 
 userRouter.use(
     session({

@@ -1,4 +1,4 @@
-const dev = require("../config/users");
+const dev = require("../config");
 const nodemailer = require("nodemailer");
 
 const sendEmailWithNodeMailer = async (emailData) => {

@@ -21,11 +21,8 @@ app.use(cookieParser());
 const usersRouter = require("./src/routes/users.js");
 app.use("/api/users", usersRouter);
 
-//admin
-const isAdmin = (req, res, next) => {
-    req.body.admin = true;
-    next();
-}
+const adminRouter = require("./src/routes/admin.js")
+app.use("/api/admin", adminRouter);
 
 //server working
 app.get("/", (req, res) => {

@@ -2,7 +2,9 @@ const formidable = require("express-formidable");
 const adminRouter = require("express").Router();
 const session = require("express-session");
 const { isLoggedIn, isLoggedOut } = require("../middlewares/auth");
-const dev = require("../config");
+const dev = require("../config/index");
+
+const { loginAdmin, logoutAdmin } = require("../controllers/admin");
 
 adminRouter.use(
     session({

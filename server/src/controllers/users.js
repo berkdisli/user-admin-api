@@ -3,7 +3,7 @@ const fs = require('fs')
 let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
-const dev = require("../config/users");
+const dev = require("../config");
 const { sendEmailWithNodeMailer } = require("../helpers/email");
 
 const getAllUsers = async (req, res) => {
