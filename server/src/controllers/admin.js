@@ -1,4 +1,4 @@
-const { compareHashPassword } = require("../helpers/securePassword");
+const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const User = require("../model/users");
 
 const loginAdmin = async (req, res) => {
@@ -62,4 +62,52 @@ const logoutAdmin = (req, res) => {
     }
 };
 
-module.exports = { loginAdmin, logoutAdmin };
+const updateUserByAdmin = async (req, res) => {
+    try {
+        const hashedPassword = await generateHashPassword(req.body.password);
+        const userData = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                ...req.body,
+                password: hashedPassword,
+                image: req.file,
+            },
+            { new: true }
+        );
+        if (!userData) {
+            res.status(400).json({
+                message: "User was not updated",
+            });
+        }
+        await userData.save();
+        res.status(200).json({
+            message: "User was updated by Admin",
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
+        });
+    }
+};
+
+const deleteUserbyAdmin = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const users = await User.findById(id);
+        if (!users) {
+            return res.status(404).json({
+                message: "user was not found with this id",
+            });
+        }
+        await User.findByIdAndDelete(id);
+        res.status(200).json({
+            message: "User was deleted by admin",
+        });
+    } catch (err) {
+        res.status(500).json({
+            message: err.message,
+        });
+    }
+};
+
+module.exports = { loginAdmin, logoutAdmin, updateUserByAdmin, deleteUserbyAdmin };

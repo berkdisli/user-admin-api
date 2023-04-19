@@ -1,10 +1,10 @@
 const express = require("express");
-const formidable = require("express-formidable");
 const session = require("express-session");
 const { getAllUsers, updateUser, deleteUser, registerUser, loginUser, verifyEmail, userProfile, logoutUser, forgetPassword, resetPassword } = require("../controllers/users");
 const { isLoggedIn, isLoggedOut } = require("../middlewares/auth");
 const userRouter = express.Router();
-const dev = require("../config")
+const dev = require("../config");
+const upload = require("../../src/middlewares/upload")
 
 userRouter.use(
     session({
@@ -17,12 +17,12 @@ userRouter.use(
 )
 
 userRouter.get("/all-users", getAllUsers);
-userRouter.post("/register", formidable(), registerUser);
+userRouter.post("/register", upload.single("image"), registerUser);
 userRouter.post("/login", isLoggedOut, loginUser);
 userRouter.get("/logout", isLoggedIn, logoutUser);
 userRouter.post("/verify-email", verifyEmail);
 userRouter.get("/", isLoggedIn, userProfile);
-userRouter.put("/", isLoggedIn, formidable(), updateUser);
+userRouter.put("/", isLoggedIn, upload.single("image"), updateUser);
 userRouter.delete("/", isLoggedIn, deleteUser);
 userRouter.post("/forget-password", forgetPassword);
 userRouter.post("/reset-password", resetPassword);
