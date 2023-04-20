@@ -5,7 +5,7 @@ const dev = require("../config/index");
 
 const { loginAdmin, logoutAdmin, updateUserByAdmin, deleteUserbyAdmin } = require("../controllers/admin");
 const isAdmin = require("../middlewares/isAdmin");
-const { registerUser } = require("../controllers/users");
+const { registerUser, getAllUsers } = require("../controllers/users");
 const upload = require("../middlewares/upload");
 
 adminRouter.use(
@@ -19,6 +19,7 @@ adminRouter.use(
 );
 adminRouter.post("/login", isLoggedOut, loginAdmin);
 adminRouter.get("/logout", isLoggedIn, logoutAdmin);
+adminRouter.get("/dashboard", isLoggedIn, getAllUsers);
 adminRouter.post("/register", upload.single("image"), registerUser);
 adminRouter.put("/dashboard/:id", isLoggedIn, isAdmin, upload.single("image"), updateUserByAdmin);
 adminRouter.delete("/dashboard/:id", isLoggedIn, isAdmin, deleteUserbyAdmin);
