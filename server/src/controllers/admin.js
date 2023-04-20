@@ -1,5 +1,7 @@
+const { errorResponse } = require("../helpers/responseHandler");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const User = require("../model/users");
+
 
 const loginAdmin = async (req, res) => {
     try {
@@ -16,20 +18,17 @@ const loginAdmin = async (req, res) => {
         }
         const user = await User.findOne({ email: email });
         if (!user) {
-            res.status(400).json({
-                message: "user with this email does not exist, please register first",
-            });
+            errorResponse(res, 400, "user with this email does not exist, please register first",
+            );
         }
         if (user.is_admin === 0) {
-            return res.status(400).json({
-                message: "user is not an admin",
-            });
+            errorResponse(res, 400, "user is not an admin",
+            );
         }
         const isPasswordMatch = await compareHashPassword(password, user.password);
         if (!isPasswordMatch) {
-            res.status(400).json({
-                message: "email/password does not match",
-            });
+            errorResponse(res, 400, "email/password does not match",
+            );
         }
         req.session.userId = user._id;
 
@@ -106,9 +105,8 @@ const updateUserByAdmin = async (req, res) => {
             { new: true }
         );
         if (!userData) {
-            res.status(400).json({
-                message: "User was not updated",
-            });
+            errorResponse(res, 400, "User was not updated",
+            );
         }
         await userData.save();
         res.status(200).json({

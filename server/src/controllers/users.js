@@ -5,6 +5,7 @@ const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const dev = require("../config");
 const { sendEmailWithNodeMailer } = require("../helpers/email");
+const { errorResponse } = require('../helpers/responseHandler');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -74,9 +75,8 @@ const registerUser = async (req, res) => {
 
         const isExist = await User.findOne({ email: email });
         if (isExist) {
-            return res.status(400).json({
-                message: `the user with this email already exists`
-            })
+            errorResponse(res, 400, `the user with this email already exists`
+            )
         }
 
         if (!name || !email || !password || !age || !phone) {
@@ -123,27 +123,23 @@ const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        if (!email || !password)
-            return res
-                .status(400)
-                .json({ message: "Bad Request: some of the fields are missing" });
+        if (!email || !password) {
+            errorResponse(res, 400, "email or passowrd not found")
+        };
 
         if (password.length < 8)
-            return res.status(400).json({
-                message: "Bad Request: password length is not valid",
-            });
+            errorResponse(res, 400, "Bad Request: password length is not valid",
+            );
 
         const user = await User.findOne({ email });
-        if (!user)
-            return res.status(400).json({
-                message:
-                    "Bad Request: user with this email does not exist. Sign up first",
-            });
+        if (!user) {
+            errorResponse(res, 400, "Bad Request: user with this email does not exist. Sign up first")
+        };
 
         const isPasswordMatch = await compareHashPassword(password, user.password);
 
         if (!isPasswordMatch)
-            return res.status(400).json({ message: "Bad Request: invalid email or password" })
+            errorResponse(res, 400, "Bad Request: invalid email or password")
 
         if (user.is_verified === 0) {
             return res.status(401).json({ message: "Unauthorized: please confirm your email first" })
@@ -176,9 +172,8 @@ const verifyEmail = async (req, res) => {
             const { name, email, hashedPassword, phone, image, age } = decoded;
             const isExist = await User.findOne({ email: email });
             if (isExist)
-                return res.status(400).json({
-                    message: `the user already exist`
-                })
+                errorResponse(res, 400, `the user already exist`
+                )
 
             //create user without image
             const newUser = new User({
@@ -199,9 +194,8 @@ const verifyEmail = async (req, res) => {
             //save the user
             const user = await newUser.save()
             if (!user) {
-                return res.status(400).json({
-                    message: `the user was not created`
-                })
+                errorResponse(res, 400, `the user was not created`
+                )
             }
 
             return res.status(200).json({
@@ -256,9 +250,8 @@ const forgetPassword = async (req, res) => {
         }
 
         const user = await User.findOne({ email: email });
-        if (!user) return res.status(400).json({
-            message: `a user wasn't found with this email address `
-        });
+        if (!user) errorResponse(res, 400, `a user wasn't found with this email address `
+        );
 
         const secretKey = dev.app.jtwSecretKey
         const hashedPassword = await generateHashPassword(password)
@@ -307,9 +300,8 @@ const resetPassword = async (req, res) => {
             const { email, hashedPassword } = decoded;
             const isExist = await User.findOne({ email: email });
             if (!isExist)
-                return res.status(400).json({
-                    message: `the user with this email doesn't exist`
-                })
+                errorResponse(res, 400, `the user with this email doesn't exist`
+                )
 
             //update data
             const updateData = await User.updateOne({ email: email },
@@ -320,9 +312,8 @@ const resetPassword = async (req, res) => {
                 })
 
             if (!updateData) {
-                return res.status(400).json({
-                    message: `reset password process is not successfull `,
-                });
+                errorResponse(res, 400, `reset password process is not successfull `,
+                );
             }
 
             return res.status(200).json({
