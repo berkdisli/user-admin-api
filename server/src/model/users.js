@@ -12,7 +12,8 @@ const usersSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "name is required"],
-        minLength: [2]
+        minLength: [2],
+        trim: true
     },
     age: {
         type: Number,
@@ -49,8 +50,8 @@ const usersSchema = new mongoose.Schema({
         default: Date.now
     },
     image: {
-        data: Buffer,
-        contentType: String
+        type: String,
+        default: "../../public/images/1681998504104-portfolio.png",
     },
     isBanned: {
         type: Boolean,

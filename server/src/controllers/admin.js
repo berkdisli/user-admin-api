@@ -141,4 +141,4 @@ const deleteUserbyAdmin = async (req, res) => {
     }
 };
 
-module.exports = { loginAdmin, logoutAdmin, updateUserByAdmin, deleteUserbyAdmin };
+module.exports = { loginAdmin, logoutAdmin, updateUserByAdmin, deleteUserbyAdmin, getAllusers };

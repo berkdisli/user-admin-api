@@ -69,8 +69,15 @@ const deleteUser = async (req, res) => {
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, age, phone } = req.fields;
-        const { image } = req.files;
+        const { name, email, password, age, phone } = req.body;
+        const { image } = req.file.filename;
+
+        const isExist = await User.findOne({ email: email });
+        if (isExist) {
+            return res.status(400).json({
+                message: `the user with this email already exists`
+            })
+        }
 
         if (!name || !email || !password || !age || !phone) {
             res.status(404).json({
@@ -83,18 +90,8 @@ const registerUser = async (req, res) => {
                 message: `min password length is 6 `
             });
         }
-        if (image && image.size > 1000000) {
-            return res.status(404).json({
-                message: `max size of image is 1mb `
-            });
-        }
 
-        const isExist = await User.findOne({ email: email });
-        if (isExist) {
-            return res.status(400).json({
-                message: `the user with this email already exists`
-            })
-        }
+
         const secretKey = dev.app.jtwSecretKey
         const hashedPassword = await generateHashPassword(password)
         const token = jwt.sign({ name, email, age, hashedPassword, phone, image }, secretKey, { expiresIn: "10m" });
@@ -106,7 +103,7 @@ const registerUser = async (req, res) => {
             html: `
             <h2>Hello ${name}!</h2>
             <p> Please click here to <a href= "${dev.app.clientURL}/api/users/activate/
-            ${token}" target = "_blank">activate your account </a> </p>
+            ${token}" target = "_blank"> activate your account </a> </p>
             `
         };
         sendEmailWithNodeMailer(emailData);
