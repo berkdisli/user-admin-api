@@ -1,4 +1,4 @@
-const { errorResponse } = require("../helpers/responseHandler");
+const { errorResponse, successResponse } = require("../helpers/responseHandler");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const User = require("../model/users");
 
@@ -51,9 +51,8 @@ const logoutAdmin = (req, res) => {
     try {
         req.session.destroy();
         res.clearCookie("admin-session");
-        res.status(200).json({
-            message: "logout successful",
-        });
+        successResponse(res, 200, "logout successful",
+        );
     } catch (err) {
         res.status(500).json({
             message: err.message
@@ -109,9 +108,8 @@ const updateUserByAdmin = async (req, res) => {
             );
         }
         await userData.save();
-        res.status(200).json({
-            message: "User was updated by Admin",
-        });
+        successResponse(res, 200, "User was updated by Admin",
+        );
     } catch (err) {
         res.status(500).json({
             message: err.message,
@@ -129,9 +127,8 @@ const deleteUserbyAdmin = async (req, res) => {
             });
         }
         await User.findByIdAndDelete(id);
-        res.status(200).json({
-            message: "User was deleted by admin",
-        });
+        successResponse(res, 200, "User was deleted by admin",
+        );
     } catch (err) {
         res.status(500).json({
             message: err.message,

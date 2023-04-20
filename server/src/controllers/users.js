@@ -43,10 +43,8 @@ const updateUser = async (req, res) => {
             updatedData.image.contentType = image.type;
         }
         await updatedData.save();
-
-        return res.status(200).json({
-            message: "the user was successfully updated",
-        });
+        successResponse(res, 200, "the user was successfully updated",
+        );
     } catch (err) {
         res.status(500).json({
             message: err.message
@@ -57,10 +55,8 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         await User.findByIdAndDelete(req.session.userId)
-        return res.status(200).json({
-            ok: true,
-            message: "the user was deleted successfully",
-        });
+        successResponse(res, 200, "the user was deleted successfully",
+        );
     } catch (err) {
         res.status(500).json({
             message: err.message
@@ -198,9 +194,8 @@ const verifyEmail = async (req, res) => {
                 )
             }
 
-            return res.status(200).json({
-                message: "the user was created and ready to sign in",
-            });
+            successResponse(res, 200, "the user was created and ready to sign in",
+            );
         });
     } catch (err) {
         res.status(500).json({
@@ -316,9 +311,8 @@ const resetPassword = async (req, res) => {
                 );
             }
 
-            return res.status(200).json({
-                message: "your new password is successfully updated ",
-            });
+            successResponse(res, 200, "your new password is successfully updated ",
+            );
         });
     } catch (err) {
         res.status(500).json({
