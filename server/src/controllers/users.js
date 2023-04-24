@@ -6,7 +6,7 @@ const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const dev = require("../config");
 const { sendEmailWithNodeMailer } = require("../helpers/email");
-const { errorResponse } = require('../helpers/responseHandler');
+const { errorResponse, successResponse } = require('../helpers/responseHandler');
 
 const getAllUsers = async (req, res) => {
     try {
