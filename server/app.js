@@ -25,8 +25,8 @@ const adminRouter = require("./src/routes/admin.js")
 app.use("/api/admin", adminRouter);
 
 //server working
-app.get("/", (req, res) => {
-    res.status(200).json({ message: "testing api" });
+app.get("/test-api", (req, res) => {
+    res.status(200).json({ message: "api is working fine" });
 });
 
 

@@ -16,14 +16,16 @@ userRouter.use(
     })
 )
 
+userRouter.route("/")
+    .get(isLoggedIn, userProfile)
+    .put(isLoggedIn, upload.single("image"), updateUser)
+    .delete(isLoggedIn, deleteUser);
+
 userRouter.get("/all-users", getAllUsers);
 userRouter.post("/register", upload.single("image"), registerUser);
 userRouter.post("/login", isLoggedOut, loginUser);
 userRouter.get("/logout", isLoggedIn, logoutUser);
 userRouter.post("/verify-email", verifyEmail);
-userRouter.get("/", isLoggedIn, userProfile);
-userRouter.put("/", isLoggedIn, upload.single("image"), updateUser);
-userRouter.delete("/", isLoggedIn, deleteUser);
 userRouter.post("/forget-password", forgetPassword);
 userRouter.post("/reset-password", resetPassword);
 
