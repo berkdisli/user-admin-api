@@ -36,16 +36,23 @@ app.use((err, req, res, next) => {
     res.status(500).send("Something broke")
 });
 
-//error
-app.use((err, req, res, next) => {
-    res.status(500).json({ message: err.message });
-});
+//client error
+const createError = require("http-errors");
 
-//not found
 app.use((req, res, next) => {
-    res.status(404).json({ message: "router not found" });
+    next(createError(404, "Route Not Found"));
 });
 
+//500
+app.use((err, req, res, next) => {
+    const statusCode = err.status
+    res.status(statusCode || 500).json({
+        error: {
+            statusCode: statusCode || 500,
+            message: err.message
+        }
+    });
+});
 
 //port listening
 const PORT = 8080;
