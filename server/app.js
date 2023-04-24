@@ -11,8 +11,12 @@ const connectDB = require("./src/config/db");
 const morgan = require("morgan");
 const cors = require("cors");
 app.use(morgan("dev"));
-app.use(cors());
-
+app.use(
+    cors({
+        original: ["http://127.0.0.1:3000", "http://localhost:3000"],
+        credentials: true,
+    })
+);
 //cookie
 var cookieParser = require('cookie-parser')
 app.use(cookieParser());
