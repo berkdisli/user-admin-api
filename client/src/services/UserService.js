@@ -7,12 +7,12 @@ export const registerUser = async (newUser) => {
 };
 
 export const activateUser = async (token) => {
-    const response = await axios.post(`${baseURL}/api/users/login`, token);
+    const response = await axios.post(`${baseURL}/api/users/verify-email`, token);
     return response.data;
 };
 
 export const loginUser = async (user) => {
-    const response = await axios.post(`${baseURL}/api/users/verify-email`, user);
+    const response = await axios.post(`${baseURL}/api/users/login`, user);
     return response.data;
 };
 
