@@ -7,7 +7,7 @@ const { getUniqueId } = require("../helpers/users");
 const { generateHashPassword, compareHashPassword } = require("../helpers/securePassword");
 const dev = require("../config");
 const { sendEmailWithNodeMailer } = require("../helpers/email");
-const { errorResponse, successResponse } = require('../helpers/responseHandler');
+const { successResponse } = require('../helpers/responseHandler');
 
 const getAllUsers = async (req, res) => {
     try {
@@ -73,7 +73,7 @@ const registerUser = async (req, res) => {
 
         const isExist = await User.findOne({ email: email });
         if (isExist) {
-            errorResponse(res, 400, `the user with this email already exists`
+            createError(400, `the user with this email already exists`
             )
         }
 
@@ -122,22 +122,22 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            errorResponse(res, 400, "email or passowrd not found")
+            createError(400, "email or password not found")
         };
 
         if (password.length < 8)
-            errorResponse(res, 400, "Bad Request: password length is not valid",
+            createError(400, "Bad Request: password length is not valid",
             );
 
         const user = await User.findOne({ email });
         if (!user) {
-            errorResponse(res, 400, "Bad Request: user with this email does not exist. Sign up first")
+            createError(400, "Bad Request: user with this email does not exist. Sign up first")
         };
 
         const isPasswordMatch = await compareHashPassword(password, user.password);
 
         if (!isPasswordMatch)
-            errorResponse(res, 400, "Bad Request: invalid email or password")
+            createError(400, "Bad Request: invalid email or password")
 
         if (user.is_verified === 0) {
             return res.status(401).json({ message: "Unauthorized: please confirm your email first" })
@@ -166,7 +166,7 @@ const verifyEmail = async (req, res) => {
             const { name, email, hashedPassword, phone, image, age } = decoded;
             const isExist = await User.findOne({ email: email });
             if (isExist)
-                errorResponse(res, 400, `the user already exist`
+                createError(400, `the user already exist`
                 )
 
             //create user without image
@@ -188,7 +188,7 @@ const verifyEmail = async (req, res) => {
             //save the user
             const user = await newUser.save()
             if (!user) {
-                errorResponse(res, 400, `the user was not created`
+                createError(400, `the user was not created`
                 )
             }
 
@@ -243,7 +243,7 @@ const forgetPassword = async (req, res) => {
         }
 
         const user = await User.findOne({ email: email });
-        if (!user) errorResponse(res, 400, `a user wasn't found with this email address `
+        if (!user) createError(400, `a user wasn't found with this email address `
         );
 
         const secretKey = dev.app.jtwSecretKey
@@ -293,7 +293,7 @@ const resetPassword = async (req, res) => {
             const { email, hashedPassword } = decoded;
             const isExist = await User.findOne({ email: email });
             if (!isExist)
-                errorResponse(res, 400, `the user with this email doesn't exist`
+                createError(400, `the user with this email doesn't exist`
                 )
 
             //update data
@@ -305,7 +305,7 @@ const resetPassword = async (req, res) => {
                 })
 
             if (!updateData) {
-                errorResponse(res, 400, `reset password process is not successfull `,
+                createError(400, `reset password process is not successfull `,
                 );
             }
 
