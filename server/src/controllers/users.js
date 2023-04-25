@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
-const fs = require('fs')
+const fs = require('fs');
+const createError = require("http-errors")
 
 let User = require("../model/users")
 const { getUniqueId } = require("../helpers/users");
@@ -153,11 +154,7 @@ const loginUser = async (req, res) => {
 const verifyEmail = async (req, res) => {
     try {
         const { token } = req.body;
-        if (!token) {
-            return res.status(404).json({
-                message: "token is missing",
-            });
-        }
+        if (!token) throw createError(404, "token not found")
 
         const secretKey = dev.app.jtwSecretKey
         jwt.verify(token, secretKey, async function (err, decoded) {

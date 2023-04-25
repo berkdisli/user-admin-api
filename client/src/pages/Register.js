@@ -41,7 +41,7 @@ const Register = () => {
             newUser.append("image", image);
 
             const response = await registerUser(newUser);
-            toast(response.message);
+            toast.success(response.message);
 
             setName("");
             setEmail("");

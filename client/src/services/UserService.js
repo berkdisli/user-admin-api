@@ -6,7 +6,18 @@ export const registerUser = async (newUser) => {
     return response.data;
 };
 
-export const loginUser = async (user) => {
-    const response = await axios.post(`${baseURL}/api/users/login`, user);
+export const activateUser = async (token) => {
+    const response = await axios.post(`${baseURL}/api/users/login`, token);
     return response.data;
 };
+
+export const loginUser = async (user) => {
+    const response = await axios.post(`${baseURL}/api/users/verify-email`, user);
+    return response.data;
+};
+
+export const logoutUser = async (user) => {
+    const response = await axios.post(`${baseURL}/api/users/logout`, user);
+    return response.data;
+};
+
